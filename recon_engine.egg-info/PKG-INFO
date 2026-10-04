@@ -1,0 +1,17 @@
+Metadata-Version: 2.4
+Name: recon-engine
+Version: 0.1.0
+Summary: Automated financial reconciliation engine: multi-pass matching into a double-entry ledger
+Requires-Python: >=3.12
+Requires-Dist: psycopg[binary]>=3.2
+Requires-Dist: fastapi>=0.115
+Requires-Dist: uvicorn>=0.30
+Requires-Dist: pydantic>=2.8
+Requires-Dist: httpx>=0.27
+Requires-Dist: openpyxl>=3.1
+Requires-Dist: cryptography>=43
+Requires-Dist: python-multipart>=0.0.9
+Provides-Extra: dev
+Requires-Dist: pytest>=8; extra == "dev"
+Requires-Dist: pytest-cov>=5; extra == "dev"
+Requires-Dist: mypy>=1.11; extra == "dev"

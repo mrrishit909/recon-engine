@@ -1,0 +1,51 @@
+# docker compose up --build      -> API + dashboard on http://localhost:8000, one worker, Postgres
+# docker compose run --rm test   -> the test suite against a throwaway database
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: recon
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-recon-dev-only}
+      POSTGRES_DB: recon
+    volumes: [pgdata:/var/lib/postgresql/data]
+    ports: ["127.0.0.1:54329:5432"]          # localhost only, for running the tests from the host
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U recon"]
+      interval: 2s
+      retries: 20
+
+  migrate:
+    build: .
+    command: python -m recon.db
+    environment: &env
+      DATABASE_URL: postgresql://recon:${POSTGRES_PASSWORD:-recon-dev-only}@db/recon
+      # no defaults on purpose: create .env first (see README), so a real deployment cannot run on a known key
+      RECON_ENCRYPTION_KEY: ${RECON_ENCRYPTION_KEY:?create .env first - see README}
+      RECON_API_TOKEN: ${RECON_API_TOKEN:?create .env first - see README}
+    depends_on:
+      db: {condition: service_healthy}
+
+  api:
+    build: .
+    command: uvicorn recon.api:app --host 0.0.0.0 --port 8000
+    environment: *env
+    ports: ["8000:8000"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+
+  worker:
+    build: .
+    command: python -m recon.queue
+    environment: *env
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+
+  test:
+    build: {context: ., target: test}
+    profiles: [test]
+    environment: *env                        # the tests create and use their own database, recon_test
+    depends_on:
+      db: {condition: service_healthy}
+
+volumes:
+  pgdata:
