@@ -45,7 +45,8 @@ running, then `venv/bin/pytest` and `venv/bin/mypy` (strict).
 ## What the synthetic month shows
 
 `recon/seed.py` generates one month of invented activity (531 records: 38 payouts and payments, 37 bank deposits, 456 charges,
-refunds and chargebacks) with nine problems planted in it. One run of the matcher:
+refunds and chargebacks) with ten irregularities planted in it: eight that need a person and two that are legitimate
+(a deposit one cent over, a euro payout landing in dollars). One run of the matcher:
 
 - **34 of 38** payouts and payments matched to a bank deposit (89.5%): 21 by reference, 11 by exact amount, 1 by tolerance
   (bank paid one cent more; booked to `recon_differences`), 1 by FX (EUR payout landed as USD).
