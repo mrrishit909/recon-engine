@@ -9,3 +9,4 @@ web/dist/
 htmlcov/
 .mypy_cache/
 .pytest_cache/
+*.egg-info/
